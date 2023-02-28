@@ -1,18 +1,21 @@
-import React, {useEffect} from "react";
+import React from "react";
 import styles from "./index.module.scss"
-import {useToDoStore} from "../../data/stores/useToDoStore";
 import {InputPlus} from "../components/InputPlus"
 import {InputTask} from "../components/InputTask";
+import { useAppDispatch, useAppSelector } from "../../redux/store";
+import { addToDO, deleteToDo, editToDo } from "../../redux/toDoSlider";
 
 export const App: React.FC = () => {
-    const [tasks, createTask, updateTask, removeTask] = useToDoStore(state => [
-        state.tasks,
-        state.createTask,
-        state.updateTask,
-        state.removeTask
-    ]);
+    const toDoList = useAppSelector((state) => state.toDo);
+    const dispatch = useAppDispatch();
 
+    function removeTask(id: string) {
+        dispatch(deleteToDo({id}));
+    }
 
+    function updateTask(id: string, title: string) {
+        dispatch(editToDo({id, title}));
+    }
 
     return (
         <article className={styles.article}>
@@ -21,16 +24,16 @@ export const App: React.FC = () => {
                 <InputPlus
                     onAdd={(title) => {
                         if (title) {
-                            createTask(title)
+                            dispatch(addToDO({title}))
                         }
                     }}
                 />
             </section>
             <section className={styles.articleSection}>
-                {!tasks.length && (
+                {!toDoList.length && (
                     <p className={styles.articleText}>There is not task.</p>
                 )}
-                {tasks.map((task) => (
+                {toDoList.map((task) => (
                     <InputTask
                         key={task.id}
                         id={task.id}
